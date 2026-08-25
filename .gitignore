@@ -1,11 +1,40 @@
+# Python Bytecode & Caches
 __pycache__/
-*.pyc
-.venv/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# Virtual Environments
 venv/
-*.png
-*.jpg
-*.jpeg
+env/
+.venv/
+ENV/
+
+# Streamlit Local Cache & Configs
+.streamlit/secrets.toml
+.streamlit/*.json
+
+# Ollama / Local Model Files & Blobs (DO NOT COMMIT MODELS)
+*.bin
+*.gguf
+*.safetensors
+models/
+.ollama/
+
+# Temporary User Uploads & Generated Exports
 *.pdf
+*.docx
+*.txt
 *.csv
 *.xlsx
-*.json
+!requirements.txt
+
+# OS-Specific Temp Files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE & Editor Settings
+.vscode/
+.idea/
+*.swp
