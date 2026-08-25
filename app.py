@@ -29,13 +29,27 @@ def extract_text(uploaded_file):
     return ""
 
 def clean_markdown_for_pdf(text):
-    """Strips markdown asterisks, hashes, and unsupported characters for clean PDF output."""
+    """Strips markdown syntax, headers, Bloom's tags, and CO tags for a clean exam export."""
+    # 1. Strip Markdown Headers (###, ##, #)
     text = re.sub(r'^#+\s*', '', text, flags=re.MULTILINE)
+    
+    # 2. Strip Bloom's Taxonomy tags (e.g., [Remember], [Apply], (Analyze))
+    bloom_words = r'Remember|Understand|Apply|Analyze|Evaluate|Create'
+    text = re.sub(rf'[\[\(]\s*({bloom_words})\s*[\]\)]', '', text, flags=re.IGNORECASE)
+    
+    # 3. Strip Course Outcome tags (e.g., [CO1], (CO2), CO3)
+    text = re.sub(r'[\[\(]\s*CO\s*\d+\s*[\]\)]', '', text, flags=re.IGNORECASE)
+    
+    # 4. Strip Bold/Italic formatting (*, **)
     text = re.sub(r'\*{1,3}(.*?)\*{1,3}', r'\1', text)
     text = re.sub(r'_{1,3}(.*?)_{1,3}', r'\1', text)
+    
+    # 5. Clean punctuation and excess whitespace
     text = text.replace('•', '-').replace('–', '-').replace('—', '-')
     text = text.replace('“', '"').replace('”', '"').replace("’", "'").replace("‘", "'")
-    return text
+    text = re.sub(r'[ \t]{2,}', ' ', text)  # Collapse double spaces created by tag removal
+    
+    return text.strip()
 
 def create_pdf(text_content, subject_title, target_time, total_marks_val):
     pdf = FPDF()
@@ -138,10 +152,17 @@ with tab1:
                 height=180
             )
         else:
-            uploaded_doc = st.file_uploader("Upload Study Material (PDF, DOCX, TXT)", type=["pdf", "docx", "txt"])
-            if uploaded_doc:
-                syllabus_content = extract_text(uploaded_doc)
-                st.success(f"Loaded {uploaded_doc.name} successfully!")
+            uploaded_docs = st.file_uploader(
+                "Upload Study Material (PDF, DOCX, TXT):", 
+                type=["pdf", "docx", "txt"], 
+                accept_multiple_files=True
+            )
+            if uploaded_docs:
+                extracted_texts = []
+                for doc_file in uploaded_docs:
+                    extracted_texts.append(f"--- Document: {doc_file.name} ---\n" + extract_text(doc_file))
+                syllabus_content = "\n\n".join(extracted_texts)
+                st.success(f"Loaded {len(uploaded_docs)} document(s) successfully!")
 
         st.subheader("2. Focus Areas")
         special_reqs = st.text_input("Topics to emphasize:", value="Focus heavily on Dynamic Programming and Tree Traversals.")
@@ -182,7 +203,7 @@ PRACTICE DETAILS:
 - Difficulty Level: {difficulty}
 
 STUDY MATERIAL / REFERENCE:
-{syllabus_content[:2500]}
+{syllabus_content[:4000]}
 """
                 with st.spinner(f"Creating practice test with {model_choice}..."):
                     try:
