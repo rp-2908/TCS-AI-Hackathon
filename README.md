@@ -31,3 +31,30 @@ An offline-first, local AI-powered practice assessment generator for students. B
 - Install [Ollama](https://ollama.com) and pull your preferred local SLM:
 ```bash
 ollama pull llama3.2:3b
+```
+
+### 2. Clone & Install Dependencies
+```bash
+git clone https://github.com/rp-2908/TCS-AI-Hackathon.git
+cd TCS-AI-Hackathon
+pip install -r requirements.txt
+```
+
+### 3. Run the Application
+```bash
+streamlit run app.py
+```
+
+
+💡 How to Use
+1. Setup Practice Parameters: Use the sidebar to configure the subject, target time, marks, difficulty tier, and question distribution.
+
+2. Provide Knowledge Base: Type custom study topics or drag and drop multiple lecture files (PDF, DOCX, TXT) to index into the vector store.
+
+3. Generate Questions: Click Generate Practice Questions to produce the question set.
+
+4. Generate Solutions: Click Generate Full Step-by-Step Solutions & Answer Key to append the complete answer guide.
+
+5. Download & Analyze: View cognitive depth in the Topic & Bloom Analytics tab or download a clean, formatted PDF export.
+
+6. Ask the Tutor: Switch to the RAG AI Study Tutor tab for follow-up explanations grounded in your uploaded documents.
